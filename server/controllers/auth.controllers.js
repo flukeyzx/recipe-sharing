@@ -124,6 +124,36 @@ export const login = async (req, res) => {
   }
 };
 
-export const logout = async (req, res) => {};
+export const logout = async (_, res) => {
+  try {
+    res.clearCookie("token");
+    return res
+      .status(200)
+      .json({ success: true, message: "Logged out successfully." });
+  } catch (error) {
+    console.error("Error in logout controller", error.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
 
-export const profile = async (req, res) => {};
+export const profile = async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: {
+        id: req.user.userId,
+      },
+      omit: {
+        password: true,
+      },
+    });
+
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    console.error("Error in profile controller", error.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error" });
+  }
+};
