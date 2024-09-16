@@ -32,6 +32,7 @@ model Recipe {
   description String
   ingredients String[]
   userId String
+  image String
   user User @relation(fields: [userId], references: [id])
   upvotes User[] @relation("Upvotes")
   createdAt DateTime @default(now())
