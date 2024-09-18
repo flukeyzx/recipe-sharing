@@ -124,3 +124,57 @@ export const deleteRecipe = async (req, res) => {
       .json({ success: false, message: "Internal server error." });
   }
 };
+
+export const upVoteRecipe = async (req, res) => {
+  const { id } = req.params;
+  const userId = req.user.userId;
+  try {
+    const isAlreadyUpvoted = await prisma.recipe.findUnique({
+      where: {
+        id,
+        upvotes: {
+          some: {
+            id: userId,
+          },
+        },
+      },
+    });
+
+    if (Boolean(isAlreadyUpvoted)) {
+      await prisma.recipe.update({
+        where: {
+          id,
+        },
+        data: {
+          upvotes: {
+            disconnect: { id: userId },
+          },
+        },
+      });
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Removed upvote successfully." });
+    } else {
+      await prisma.recipe.update({
+        where: {
+          id,
+        },
+        data: {
+          upvotes: {
+            connect: { id: userId },
+          },
+        },
+      });
+
+      return res
+        .status(200)
+        .json({ success: true, message: "Recipe upvoted successfully." });
+    }
+  } catch (error) {
+    console.error("Error in upVoteRecipe controller", error.message);
+    return res
+      .status(500)
+      .json({ success: false, message: "Internal server error." });
+  }
+};

@@ -1,4 +1,12 @@
 import { app } from "./app.js";
+import cors from "cors";
+
+app.arguments(
+  cors({
+    origin: "*",
+    credentials: true,
+  })
+);
 
 const port = process.env.PORT || 4000;
 
